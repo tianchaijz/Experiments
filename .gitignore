@@ -1,0 +1,10 @@
+.DS_Store
+*.DS_Store
+
+tags
+
+*.swp
+*.o
+*.a
+*.so
+*.out
