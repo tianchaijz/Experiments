@@ -3,15 +3,40 @@ local socket = require "socket"
 
 local download, receive, get, dispatch
 local threads, host, port
+local timeout, select_timeout = 5, 0.1
+local select_times = timeout / select_timeout
 
 
 function download(host, file)
     local conn = socket.tcp()
-    conn:settimeout(5, "block")
+    conn:settimeout(0, "block")
+
     local ok, err = conn:connect(host, port)
     if not ok then
-        print("error:", err)
-        return
+        if err ~= "timeout" then
+            print("error:", err)
+            return
+        end
+
+        for i = 1, select_times + 1 do
+            if i > select_times then
+                print("connection timeout")
+                return
+            end
+
+            local _, w, e = socket.select(nil, { conn }, select_timeout)
+            if #w > 0 then
+                print(string.format("connection to %s:%s succeeded", host, port))
+                break
+            end
+
+            if e == "timeout" then
+                coroutine.yield(true)
+            else
+                print("connection error")
+                return
+            end
+        end
     end
 
     -- counts number of bytes read
