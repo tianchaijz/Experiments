@@ -7,7 +7,12 @@ local threads, host, port
 
 function download(host, file)
     local conn = socket.tcp()
-    assert(conn:connect(host, port))
+    conn:settimeout(5, "block")
+    local ok, err = conn:connect(host, port)
+    if not ok then
+        print("error:", err)
+        return
+    end
 
     -- counts number of bytes read
     local count = 0
@@ -24,12 +29,12 @@ function download(host, file)
 end
 
 
-function receive(connection)
+function receive(conn)
     -- do not block
-    connection:settimeout(0)
-    local s, status, partial = connection:receive(2^10)
+    conn:settimeout(0)
+    local s, status, partial = conn:receive(2^10)
     if status == "timeout" then
-        coroutine.yield(connection)
+        coroutine.yield(conn)
     end
 
     return s or partial, status
@@ -59,7 +64,7 @@ function dispatch()
 
         local status, res = coroutine.resume(threads[i])
         -- thread finished its task?
-        if not res then
+        if status == false or not res then
             table.remove(threads, i)
         else
             -- go to next thread
@@ -76,6 +81,8 @@ get(host, "/1")
 get(host, "/2")
 get(host, "/3")
 
+-- simulate connection timeout
+-- iptables -I INPUT -s 127.0.0.1 -p tcp --dport 3101 -j DROP
 
 -- main loop
 dispatch()
