@@ -9,13 +9,13 @@ import sys
 
 LUA_PATH = os.path.expandvars("$HOME/openresty/lua/src")
 CC_ARGUMENTS = [
-  'cc',
-  '-g',
-  '-O0',
-  '-Wall',
-  '-Werror',
-  '-Wno-unused',
-  '-Wpointer-arith',
+    'cc',
+    '-g',
+    '-O0',
+    '-Wall',
+    '-Werror',
+    '-Wno-unused',
+    '-Wpointer-arith',
 ]
 
 program = sys.argv[1]
@@ -23,10 +23,10 @@ assert program, "program required"
 
 parts = program.split('.')
 suffix = parts[-1].lower()
-assert suffix in ["c", "cc"], "C/C++ program required"
+assert suffix in ["c", "cc", "cpp"], "C/C++ program required"
 
 name = parts[0]
-if suffix == "cc":
+if suffix == "cc" or suffix == "cpp":
     CC_ARGUMENTS[0] = "g++"
     CC_ARGUMENTS.append("--std=c++11")
 
