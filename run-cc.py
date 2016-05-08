@@ -36,6 +36,7 @@ if "lua_State" in open(program, 'r').read():
     CC_ARGUMENTS.append("-llua5.1")
     CC_ARGUMENTS.append("-Wl,-rpath,%s" % LUA_PATH)
 
+CC_ARGUMENTS.extend(sys.argv[2:])
 CC_ARGUMENTS.append("-o")
 CC_ARGUMENTS.append(name + ".out")
 CC_ARGUMENTS.append(program)
