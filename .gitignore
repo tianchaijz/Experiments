@@ -9,3 +9,5 @@ tags
 *.a
 *.so
 *.out
+
+lua-wrapper/counter/build
